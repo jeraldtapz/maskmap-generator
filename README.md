@@ -48,6 +48,7 @@
 
 <a name="improvements"></a>
 ## Future improvements
+* Make which goes to which channel configurable, e.g. Metalic, AO, Smoothness in the R, G and B channels and not use the alpha channel to save from memory
 * Add a loading indicator
 * Run the generation asynchronously so that it doesn't hang up the editor for high resolution textures, e.g. 4K+ textures.
 * Name inference based on textures used
