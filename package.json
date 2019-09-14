@@ -1,0 +1,12 @@
+{
+    "name": "com.jeraldtapz.mask-map-generator",
+    "displayName": "Mask Map Generator",
+    "version": "0.0.1",
+    "unity": "2019.3",
+    "description": "Mask Map generator is a simple tool to generate Mask texture maps right on the Unity Editor",
+    "dependencies": {},
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/jeraldtapz/maskmap-generator.git",
+    }
+  }
