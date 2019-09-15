@@ -1,14 +1,9 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
+﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
 
 namespace Utils
 {
-    using Color = UnityEngine.Color;
-    using FontStyle = UnityEngine.FontStyle;
-
     public class Log
     {
         public string Message;
@@ -25,7 +20,6 @@ namespace Utils
     {
         private static bool textureInputFoldoutEnabled = true;
         private static bool metadataInputFoldoutEnabled = true;
-        private static bool manualSize = false;
         private static Texture2D metallicMap;
         private static Texture2D aoMap;
         private static Texture2D detailMap;
@@ -50,32 +44,29 @@ namespace Utils
 
                 if (nameToLower.Contains("metallic"))
                 {
-                    metallicMap = (Texture2D) o;
+                    metallicMap = (Texture2D)o;
                 }
                 else if (nameToLower.Contains("occlusion") || nameToLower.Contains("_ao") || nameToLower.Contains(" ao"))
                 {
-                    aoMap = (Texture2D) o;
+                    aoMap = (Texture2D)o;
                 }
                 else if (nameToLower.Contains("detail"))
                 {
-                    detailMap = (Texture2D) o;
+                    detailMap = (Texture2D)o;
                 }
                 else if (nameToLower.Contains("smoothness"))
                 {
-                    smoothnessMap = (Texture2D) o;
+                    smoothnessMap = (Texture2D)o;
                 }
             }
 
             textureInputFoldoutEnabled = true;
             metadataInputFoldoutEnabled = true;
-            manualSize = true;
 
             if (width == 0)
                 width = 1024;
             if (height == 0)
                 height = 1024;
-
-
 
             GetWindowWithRect<MaskMapGenerator>(new Rect(0, 0, 600, 420), true, "Mask Map Generator");
             GetWindow<MaskMapGenerator>();
@@ -114,8 +105,6 @@ namespace Utils
             {
                 EditorGUILayout.BeginHorizontal();
 
-                manualSize = EditorGUILayout.BeginToggleGroup("Manual Resize", manualSize);
-                if (manualSize)
                 {
                     EditorGUILayout.LabelField("Width", new GUIStyle() { fontStyle = FontStyle.Bold });
                     width = EditorGUILayout.IntField(width);
@@ -125,7 +114,6 @@ namespace Utils
                     EditorGUILayout.LabelField("Height", new GUIStyle() { fontStyle = FontStyle.Bold });
                     height = EditorGUILayout.IntField(height);
                 }
-                EditorGUILayout.EndToggleGroup();
 
                 EditorGUILayout.EndHorizontal();
 
@@ -179,6 +167,8 @@ namespace Utils
 
         private static void GenerateMaskMap(string path)
         {
+            EditorUtility.DisplayProgressBar("Generating the mask map, please wait...", "", 0f);
+
             bool metallicPendingForReadableEdit = metallicMap != null && !metallicMap.isReadable;
             bool aoPendingForReadableEdit = aoMap != null && !aoMap.isReadable;
             bool detailPendingForReadableEdit = detailMap != null && !detailMap.isReadable;
@@ -187,7 +177,7 @@ namespace Utils
             if (metallicPendingForReadableEdit || aoPendingForReadableEdit ||
                 detailPendingForReadableEdit || smoothnessPendingForReadableEdit)
             {
-                string metallicName = metallicPendingForReadableEdit ? metallicMap.name  + "\n" : "";
+                string metallicName = metallicPendingForReadableEdit ? metallicMap.name + "\n" : "";
                 string aoName = aoPendingForReadableEdit ? aoMap.name + "\n" : "";
                 string detailName = detailPendingForReadableEdit ? detailMap.name + "\n" : "";
                 string smoothnessName = smoothnessPendingForReadableEdit ? smoothnessMap.name : "";
@@ -196,7 +186,7 @@ namespace Utils
 
                 if (EditorUtility.DisplayDialog("Warning", dialogMessage, "Confirm", "Cancel"))
                 {
-                    Texture2D[] textures = new Texture2D[]{metallicMap, aoMap, detailMap, smoothnessMap};
+                    Texture2D[] textures = new Texture2D[] { metallicMap, aoMap, detailMap, smoothnessMap };
                     bool[] pendingForEdit = new bool[]
                     {
                         metallicPendingForReadableEdit, aoPendingForReadableEdit,
@@ -226,8 +216,10 @@ namespace Utils
             maskMap = new Texture2D(width, height/*, DefaultFormat.LDR, TextureCreationFlags.None*/);
 
             Color colorCache = Color.black;
+
             for (int i = 0; i < width; i++)
             {
+                EditorUtility.DisplayProgressBar("Generating the mask map, please wait...", "", i / (float)width);
                 for (int j = 0; j < height; j++)
                 {
                     colorCache.r = metallicMap != null ? metallicMap.GetPixel(i, j).r : 0;
@@ -240,12 +232,12 @@ namespace Utils
 
             byte[] bytes = maskMap.EncodeToPNG();
 
-            using (Image image = Image.FromStream(new MemoryStream(bytes)))
+            if (bytes != null)
             {
-                image.Save(path + Path.DirectorySeparatorChar + fileName + ".png", ImageFormat.Png);
-                log.SetMessage($"{fileName}.png successfully generated", Color.black);
+                File.WriteAllBytes($"{path}{Path.DirectorySeparatorChar}{fileName}.png", bytes);
             }
 
+            EditorUtility.ClearProgressBar();
             AssetDatabase.Refresh();
         }
 
