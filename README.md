@@ -2,7 +2,6 @@
 *  [Mask Map Generator](#maskmapgenerator)
 *  [Installation](#installation)
 *  [Using the Mask Map Generator](#open)
-*  [Warning](#warning)
 *  [Future Improvements](#improvements)
 
 <a name="mask_map_definition"></a>
@@ -40,11 +39,6 @@
 ![Generated Mask Map](Assets/Docs/images/MaskMap_generated.PNG)
 
 ### The green color is from the fact that we didn't have a texture set for the detail map which corresponds to the Blue channel. The metallic texture used which goes to the Red channel is mostly black so the resulting image is somewhat Green. It doesn't matter though as we are not interested in the colors generated in the RGB channel. Each channel are being used differently and independently.
-
-
-<a name="warning"></a>
-## Warning 
-### The tool uses System.Drawing.dll from the .Net Framework. It shows an error in the Editor "Loading assembly failed: "Assets/Libraries/System.Drawing.dll" ". You can ignore this error if you set the System.Drawing.dll import settings to be only in Editor. The .dll file works perfectly fine. It's just that Unity thinks that this specific library is unsafe. 
 
 <a name="improvements"></a>
 ## Future improvements
